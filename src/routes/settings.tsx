@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Sun, Moon, Bell, Languages, Wand2 } from "lucide-react";
+import { Sun, Moon, Sunrise, Bell, Languages, Wand2 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
@@ -48,7 +48,18 @@ function SettingsPage() {
           >
             <Moon className="h-4 w-4" /> Dark mode
           </Button>
+          <Button
+            variant={settings.theme === "dynamic" ? "default" : "outline"}
+            onClick={() => update("theme", "dynamic")}
+            className="gap-2"
+          >
+            <Sunrise className="h-4 w-4" /> Dynamic (time-based)
+          </Button>
         </div>
+        <p className="mt-3 text-xs text-muted-foreground">
+          Dynamic mode automatically switches between a bright Sunrise palette (6 AM–6 PM) and a
+          warm Sunset palette in the evening.
+        </p>
       </Card>
 
       <Card className="p-5">
