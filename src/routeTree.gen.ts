@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as TasksRouteImport } from './routes/tasks'
 import { Route as ResponsibleAiRouteImport } from './routes/responsible-ai'
 import { Route as ResearchRouteImport } from './routes/research'
+import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as MeetingsRouteImport } from './routes/meetings'
 import { Route as EmailRouteImport } from './routes/email'
 import { Route as IndexRouteImport } from './routes/index'
@@ -30,6 +31,11 @@ const ResponsibleAiRoute = ResponsibleAiRouteImport.update({
 const ResearchRoute = ResearchRouteImport.update({
   id: '/research',
   path: '/research',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProfileRoute = ProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MeetingsRoute = MeetingsRouteImport.update({
@@ -57,6 +63,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/email': typeof EmailRoute
   '/meetings': typeof MeetingsRoute
+  '/profile': typeof ProfileRoute
   '/research': typeof ResearchRoute
   '/responsible-ai': typeof ResponsibleAiRoute
   '/tasks': typeof TasksRoute
@@ -66,6 +73,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/email': typeof EmailRoute
   '/meetings': typeof MeetingsRoute
+  '/profile': typeof ProfileRoute
   '/research': typeof ResearchRoute
   '/responsible-ai': typeof ResponsibleAiRoute
   '/tasks': typeof TasksRoute
@@ -76,6 +84,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/email': typeof EmailRoute
   '/meetings': typeof MeetingsRoute
+  '/profile': typeof ProfileRoute
   '/research': typeof ResearchRoute
   '/responsible-ai': typeof ResponsibleAiRoute
   '/tasks': typeof TasksRoute
@@ -87,6 +96,7 @@ export interface FileRouteTypes {
     | '/'
     | '/email'
     | '/meetings'
+    | '/profile'
     | '/research'
     | '/responsible-ai'
     | '/tasks'
@@ -96,6 +106,7 @@ export interface FileRouteTypes {
     | '/'
     | '/email'
     | '/meetings'
+    | '/profile'
     | '/research'
     | '/responsible-ai'
     | '/tasks'
@@ -105,6 +116,7 @@ export interface FileRouteTypes {
     | '/'
     | '/email'
     | '/meetings'
+    | '/profile'
     | '/research'
     | '/responsible-ai'
     | '/tasks'
@@ -115,6 +127,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   EmailRoute: typeof EmailRoute
   MeetingsRoute: typeof MeetingsRoute
+  ProfileRoute: typeof ProfileRoute
   ResearchRoute: typeof ResearchRoute
   ResponsibleAiRoute: typeof ResponsibleAiRoute
   TasksRoute: typeof TasksRoute
@@ -142,6 +155,13 @@ declare module '@tanstack/react-router' {
       path: '/research'
       fullPath: '/research'
       preLoaderRoute: typeof ResearchRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/profile': {
+      id: '/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof ProfileRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/meetings': {
@@ -179,6 +199,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   EmailRoute: EmailRoute,
   MeetingsRoute: MeetingsRoute,
+  ProfileRoute: ProfileRoute,
   ResearchRoute: ResearchRoute,
   ResponsibleAiRoute: ResponsibleAiRoute,
   TasksRoute: TasksRoute,
