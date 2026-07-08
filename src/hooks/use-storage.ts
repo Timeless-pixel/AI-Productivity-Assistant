@@ -8,6 +8,8 @@ import {
   getStreak,
   getWorkspace,
   getFavoriteTemplates,
+  getNotifications,
+  getCommandHistory,
   setProfile as writeProfile,
   setSettings as writeSettings,
   type ActivityEntry,
@@ -17,6 +19,7 @@ import {
   type Thread,
   type Streak,
   type WorkspaceDoc,
+  type NotificationItem,
 } from "@/lib/storage";
 
 function useStore<T>(read: () => T): [T, () => void] {
@@ -60,6 +63,14 @@ export function useWorkspace(): WorkspaceDoc[] {
 }
 export function useFavoriteTemplates(): string[] {
   return useStore(getFavoriteTemplates)[0];
+}
+
+export function useNotifications(): NotificationItem[] {
+  return useStore(getNotifications)[0];
+}
+
+export function useCommandHistory(): string[] {
+  return useStore(getCommandHistory)[0];
 }
 
 export function useHydrated() {
