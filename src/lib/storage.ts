@@ -227,6 +227,14 @@ export function touchStreak(): { streak: Streak; leveledUp: boolean } {
   const milestones = [3, 7, 30, 100];
   if (milestones.includes(s.current) && s.current !== prev) leveledUp = true;
   write(KEYS.streak, s);
+  if (s.current !== prev) {
+    pushNotification({
+      kind: "streak",
+      icon: "🔥",
+      title: `Productivity streak — ${s.current} day${s.current === 1 ? "" : "s"}!`,
+      body: streakMessage(s.current),
+    });
+  }
   return { streak: s, leveledUp };
 }
 export function streakBadge(n: number): { icon: string; label: string } {
