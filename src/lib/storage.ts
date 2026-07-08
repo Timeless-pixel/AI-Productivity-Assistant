@@ -290,6 +290,12 @@ export function addWorkspaceDoc(
   const list = getWorkspace();
   list.unshift(full);
   saveWorkspace(list);
+  pushNotification({
+    kind: "workspace",
+    icon: "⭐",
+    title: "Document saved to Workspace",
+    body: full.title,
+  });
   return full;
 }
 export function updateWorkspaceDoc(id: string, patch: Partial<WorkspaceDoc>) {
