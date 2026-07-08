@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Search, Wand2, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -26,16 +26,29 @@ export const Route = createFileRoute("/research")({
       { name: "description", content: "Structured AI-powered workplace research reports." },
     ],
   }),
+  validateSearch: (s: Record<string, unknown>) => ({
+    prompt: typeof s.prompt === "string" ? s.prompt : undefined,
+  }),
   component: ResearchPage,
 });
 
 function ResearchPage() {
+  const search = Route.useSearch();
   const run = useServerFn(runResearch);
   const [topic, setTopic] = useState("");
   const [depth, setDepth] = useState("Standard");
   const [output, setOutput] = useState("");
   const [ts, setTs] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (search.prompt && !topic) {
+      try {
+        setTopic(decodeURIComponent(search.prompt));
+      } catch {}
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [search.prompt]);
 
   const submit = async () => {
     if (!topic.trim()) {
@@ -116,6 +129,8 @@ function ResearchPage() {
             loading={loading}
             timestamp={ts}
             onRegenerate={output ? submit : undefined}
+            saveKind="research"
+            saveTitle={topic}
             emptyMessage="Enter a topic to receive a structured research report."
             extraActions={
               output ? (
