@@ -1,5 +1,5 @@
 import { createFileRoute, Link, Outlet, useNavigate, useParams } from "@tanstack/react-router";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 import { MessageSquare, Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -25,17 +25,6 @@ function ChatLayout() {
   const navigate = useNavigate();
   const params = useParams({ strict: false }) as { threadId?: string };
   const activeId = params.threadId;
-
-  const [autoCreated, setAutoCreated] = useState(false);
-  const showEmpty = hydrated && !activeId && threads.length === 0;
-
-  useEffect(() => {
-    if (!hydrated || activeId || autoCreated) return;
-    if (threads.length > 0) {
-      navigate({ to: "/chat/$threadId", params: { threadId: threads[0].id } });
-    }
-    setAutoCreated(true);
-  }, [hydrated, activeId, autoCreated, threads, navigate]);
 
   const createThread = () => {
     const id = crypto.randomUUID();
@@ -106,29 +95,11 @@ function ChatLayout() {
       </aside>
 
       <div className="min-w-0 flex-1">
-        {showEmpty ? (
-          <EmptyChat onCreate={createThread} />
-        ) : (
-          <Outlet />
-        )}
+        <Outlet />
       </div>
     </div>
   );
 }
 
-function EmptyChat({ onCreate }: { onCreate: () => void }) {
-  return (
-    <div className="grid h-full place-items-center rounded-xl border border-dashed border-border bg-card p-8 text-center">
-      <div className="max-w-md">
-        <MessageSquare className="mx-auto h-10 w-10 text-primary" />
-        <h2 className="mt-3 text-xl font-bold text-foreground">Start chatting with Nova</h2>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Ask about workplace questions, productivity, brainstorming, writing, coding, business ideas — anything you need.
-        </p>
-        <Button onClick={onCreate} className="mt-4 gap-2">
-          <Plus className="h-4 w-4" /> New chat
-        </Button>
-      </div>
-    </div>
-  );
-}
+// Suppress unused warning if hydrated ever unused
+void useHydrated;
