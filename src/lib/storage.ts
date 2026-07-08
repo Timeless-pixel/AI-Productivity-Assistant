@@ -124,6 +124,26 @@ export function pushActivity(entry: Omit<ActivityEntry, "id" | "createdAt">) {
   };
   list.unshift(next);
   write(KEYS.activity, list.slice(0, 30));
+  const iconByKind: Record<ActivityKind, string> = {
+    email: "📧",
+    research: "📚",
+    meeting: "📝",
+    tasks: "✅",
+    chat: "🤖",
+  };
+  const titleByKind: Record<ActivityKind, string> = {
+    email: "Email generated successfully.",
+    research: "Research report ready.",
+    meeting: "Meeting summary completed.",
+    tasks: "Task plan generated.",
+    chat: "New Nova conversation.",
+  };
+  pushNotification({
+    kind: entry.kind,
+    icon: iconByKind[entry.kind],
+    title: titleByKind[entry.kind],
+    body: entry.title,
+  });
 }
 
 /* ---- Profile ---- */
