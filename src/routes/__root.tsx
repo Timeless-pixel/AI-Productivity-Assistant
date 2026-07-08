@@ -15,6 +15,8 @@ import { SidebarProvider, SidebarTrigger, SidebarInset } from "@/components/ui/s
 import { AppSidebar } from "@/components/app-sidebar";
 import { Toaster } from "@/components/ui/sonner";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { NotificationCenter } from "@/components/notification-center";
+import { CommandPaletteTrigger } from "@/components/command-palette";
 
 function NotFoundComponent() {
   return (
@@ -173,6 +175,8 @@ function RootComponent() {
                 WorkWise AI
               </div>
               <div className="ml-auto flex items-center gap-1">
+                <CommandPaletteTrigger />
+                <NotificationCenter />
                 <ThemeToggle />
               </div>
             </header>
