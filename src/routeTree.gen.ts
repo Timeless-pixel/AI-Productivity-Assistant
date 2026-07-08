@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TemplatesRouteImport } from './routes/templates'
 import { Route as TasksRouteImport } from './routes/tasks'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as ResponsibleAiRouteImport } from './routes/responsible-ai'
@@ -22,6 +23,11 @@ import { Route as ChatIndexRouteImport } from './routes/chat.index'
 import { Route as ChatThreadIdRouteImport } from './routes/chat.$threadId'
 import { Route as ApiChatRouteImport } from './routes/api/chat'
 
+const TemplatesRoute = TemplatesRouteImport.update({
+  id: '/templates',
+  path: '/templates',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TasksRoute = TasksRouteImport.update({
   id: '/tasks',
   path: '/tasks',
@@ -93,6 +99,7 @@ export interface FileRoutesByFullPath {
   '/responsible-ai': typeof ResponsibleAiRoute
   '/settings': typeof SettingsRoute
   '/tasks': typeof TasksRoute
+  '/templates': typeof TemplatesRoute
   '/api/chat': typeof ApiChatRoute
   '/chat/$threadId': typeof ChatThreadIdRoute
   '/chat/': typeof ChatIndexRoute
@@ -106,6 +113,7 @@ export interface FileRoutesByTo {
   '/responsible-ai': typeof ResponsibleAiRoute
   '/settings': typeof SettingsRoute
   '/tasks': typeof TasksRoute
+  '/templates': typeof TemplatesRoute
   '/api/chat': typeof ApiChatRoute
   '/chat/$threadId': typeof ChatThreadIdRoute
   '/chat': typeof ChatIndexRoute
@@ -121,6 +129,7 @@ export interface FileRoutesById {
   '/responsible-ai': typeof ResponsibleAiRoute
   '/settings': typeof SettingsRoute
   '/tasks': typeof TasksRoute
+  '/templates': typeof TemplatesRoute
   '/api/chat': typeof ApiChatRoute
   '/chat/$threadId': typeof ChatThreadIdRoute
   '/chat/': typeof ChatIndexRoute
@@ -137,6 +146,7 @@ export interface FileRouteTypes {
     | '/responsible-ai'
     | '/settings'
     | '/tasks'
+    | '/templates'
     | '/api/chat'
     | '/chat/$threadId'
     | '/chat/'
@@ -150,6 +160,7 @@ export interface FileRouteTypes {
     | '/responsible-ai'
     | '/settings'
     | '/tasks'
+    | '/templates'
     | '/api/chat'
     | '/chat/$threadId'
     | '/chat'
@@ -164,6 +175,7 @@ export interface FileRouteTypes {
     | '/responsible-ai'
     | '/settings'
     | '/tasks'
+    | '/templates'
     | '/api/chat'
     | '/chat/$threadId'
     | '/chat/'
@@ -179,11 +191,19 @@ export interface RootRouteChildren {
   ResponsibleAiRoute: typeof ResponsibleAiRoute
   SettingsRoute: typeof SettingsRoute
   TasksRoute: typeof TasksRoute
+  TemplatesRoute: typeof TemplatesRoute
   ApiChatRoute: typeof ApiChatRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/templates': {
+      id: '/templates'
+      path: '/templates'
+      fullPath: '/templates'
+      preLoaderRoute: typeof TemplatesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/tasks': {
       id: '/tasks'
       path: '/tasks'
@@ -293,6 +313,7 @@ const rootRouteChildren: RootRouteChildren = {
   ResponsibleAiRoute: ResponsibleAiRoute,
   SettingsRoute: SettingsRoute,
   TasksRoute: TasksRoute,
+  TemplatesRoute: TemplatesRoute,
   ApiChatRoute: ApiChatRoute,
 }
 export const routeTree = rootRouteImport
