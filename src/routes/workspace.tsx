@@ -108,6 +108,10 @@ function WorkspacePage() {
         description="Your AI Workspace keeps everything you've created in one organised place."
       />
 
+      <div className="rounded-[var(--radius-lg)] border border-primary/20 bg-primary/5 px-4 py-3 text-sm text-foreground">
+        ✨ Everything you create with AI is securely organized in your Workspace.
+      </div>
+
       <Card className="p-3">
         <div className="flex flex-col gap-3 lg:flex-row lg:items-center">
           <div className="flex flex-1 items-center gap-2 px-2">

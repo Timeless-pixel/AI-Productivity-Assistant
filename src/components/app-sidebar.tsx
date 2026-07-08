@@ -11,6 +11,7 @@ import {
   Settings as SettingsIcon,
   LibraryBig,
   FolderKanban,
+  BarChart3,
 } from "lucide-react";
 import {
   Sidebar,
@@ -35,6 +36,7 @@ const primary = [
   { title: "Task Planner", url: "/tasks", icon: ListChecks },
   { title: "Templates", url: "/templates", icon: LibraryBig },
   { title: "Workspace", url: "/workspace", icon: FolderKanban },
+  { title: "Analytics", url: "/analytics", icon: BarChart3 },
 ];
 
 const secondary = [

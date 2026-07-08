@@ -29,6 +29,16 @@ import {
   useStreak,
 } from "@/hooks/use-storage";
 import { productivityScore, streakBadge, streakMessage, AI_TIPS } from "@/lib/storage";
+import { estimatedHoursSaved, novaInsights, activityByDay } from "@/lib/storage";
+import {
+  ResponsiveContainer,
+  BarChart,
+  Bar,
+  XAxis,
+  Tooltip,
+  CartesianGrid,
+} from "recharts";
+import { Clock, BarChart3 } from "lucide-react";
 import { TEMPLATES } from "@/lib/templates";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { useEffect, useState } from "react";
@@ -82,6 +92,9 @@ function Dashboard() {
   const score = productivityScore(stats);
   const badge = streakBadge(streak.current);
   const featured = TEMPLATES.slice(0, 4);
+  const insights = hydrated ? novaInsights(stats, streak.current) : [];
+  const hours = hydrated ? estimatedHoursSaved(stats) : 0;
+  const trend = hydrated ? activityByDay(activity) : [];
 
   const suggestions = [
     "Prioritise high-impact tasks each morning.",
@@ -290,6 +303,73 @@ function Dashboard() {
             </div>
           </Card>
         ))}
+      </section>
+
+      <section className="grid gap-6 lg:grid-cols-3">
+        <Card className="p-5 lg:col-span-2">
+          <div className="mb-3 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Sparkles className="h-5 w-5 text-primary" />
+              <h3 className="text-lg font-semibold text-foreground">Nova Insights</h3>
+            </div>
+            <Link to="/analytics" className="text-xs font-medium text-primary hover:underline">
+              Open analytics →
+            </Link>
+          </div>
+          {insights.length === 0 ? (
+            <div className="rounded-md border border-dashed border-border p-6 text-sm text-muted-foreground">
+              Nova will share personalised suggestions once you start using the AI tools.
+            </div>
+          ) : (
+            <ul className="space-y-2">
+              {insights.map((t) => (
+                <li
+                  key={t}
+                  className="rounded-md border border-border/60 bg-muted/30 p-3 text-sm text-foreground animate-fade-in"
+                >
+                  💡 {t}
+                </li>
+              ))}
+            </ul>
+          )}
+          <div className="mt-4 h-40 w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={trend} margin={{ top: 5, right: 6, left: -28, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.4} />
+                <XAxis dataKey="day" stroke="hsl(var(--muted-foreground))" fontSize={11} />
+                <Tooltip
+                  contentStyle={{
+                    background: "hsl(var(--card))",
+                    border: "1px solid hsl(var(--border))",
+                    borderRadius: 8,
+                    fontSize: 12,
+                  }}
+                />
+                <Bar dataKey="count" fill="hsl(var(--primary))" radius={[6, 6, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </Card>
+
+        <Card className="p-5">
+          <div className="mb-2 flex items-center gap-2">
+            <Clock className="h-5 w-5 text-primary" />
+            <h3 className="text-lg font-semibold text-foreground">Time saved</h3>
+          </div>
+          <div className="text-4xl font-bold text-foreground">
+            ~{hours}
+            <span className="ml-1 text-base font-medium text-muted-foreground">hrs</span>
+          </div>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Estimated hours saved by delegating work to Nova.
+          </p>
+          <Link
+            to="/analytics"
+            className="mt-5 inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline"
+          >
+            <BarChart3 className="h-3.5 w-3.5" /> View full analytics →
+          </Link>
+        </Card>
       </section>
 
       <section className="grid gap-6 lg:grid-cols-3">
