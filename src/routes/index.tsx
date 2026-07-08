@@ -29,6 +29,16 @@ import {
   useStreak,
 } from "@/hooks/use-storage";
 import { productivityScore, streakBadge, streakMessage, AI_TIPS } from "@/lib/storage";
+import { estimatedHoursSaved, novaInsights, activityByDay } from "@/lib/storage";
+import {
+  ResponsiveContainer,
+  BarChart,
+  Bar,
+  XAxis,
+  Tooltip,
+  CartesianGrid,
+} from "recharts";
+import { Clock, BarChart3 } from "lucide-react";
 import { TEMPLATES } from "@/lib/templates";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { useEffect, useState } from "react";
@@ -82,6 +92,9 @@ function Dashboard() {
   const score = productivityScore(stats);
   const badge = streakBadge(streak.current);
   const featured = TEMPLATES.slice(0, 4);
+  const insights = hydrated ? novaInsights(stats, streak.current) : [];
+  const hours = hydrated ? estimatedHoursSaved(stats) : 0;
+  const trend = hydrated ? activityByDay(activity) : [];
 
   const suggestions = [
     "Prioritise high-impact tasks each morning.",
