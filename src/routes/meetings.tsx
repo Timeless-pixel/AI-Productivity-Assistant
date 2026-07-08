@@ -106,6 +106,8 @@ function MeetingsPage() {
           loading={loading}
           timestamp={ts}
           onRegenerate={output ? submit : undefined}
+          saveKind="meeting"
+          saveTitle={notes.slice(0, 60)}
           emptyMessage="Your meeting summary will appear here."
           extraActions={
             output ? (
