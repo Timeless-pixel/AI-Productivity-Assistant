@@ -10,6 +10,8 @@ const KEYS = {
   streak: "workwise:streak",
   workspace: "workwise:workspace",
   favTemplates: "workwise:fav-templates",
+  notifications: "workwise:notifications",
+  cmdHistory: "workwise:cmd-history",
 } as const;
 
 export type ActivityKind =
