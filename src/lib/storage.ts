@@ -102,6 +102,11 @@ export function bumpStat(kind: ActivityKind) {
   const s = getStats();
   s[kind] = (s[kind] ?? 0) + 1;
   write(KEYS.stats, s);
+  try {
+    touchStreak();
+  } catch {
+    // ignore
+  }
 }
 
 /* ---- Activity feed ---- */
