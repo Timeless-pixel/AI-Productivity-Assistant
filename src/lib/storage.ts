@@ -337,3 +337,121 @@ export function effectiveTheme(mode: Settings["theme"]): "light" | "dark" | "sun
   const h = new Date().getHours();
   return h >= 6 && h < 18 ? "sunrise" : "sunset";
 }
+/* ---- Notifications ---- */
+export type NotificationKind =
+  | ActivityKind
+  | "workspace"
+  | "streak"
+  | "tip"
+  | "system";
+
+export type NotificationItem = {
+  id: string;
+  kind: NotificationKind;
+  icon: string;
+  title: string;
+  body?: string;
+  createdAt: number;
+  read: boolean;
+};
+
+export function getNotifications(): NotificationItem[] {
+  return read<NotificationItem[]>(KEYS.notifications, []);
+}
+export function saveNotifications(list: NotificationItem[]) {
+  write(KEYS.notifications, list.slice(0, 50));
+}
+export function pushNotification(n: Omit<NotificationItem, "id" | "createdAt" | "read">) {
+  const list = getNotifications();
+  list.unshift({
+    ...n,
+    id: crypto.randomUUID(),
+    createdAt: Date.now(),
+    read: false,
+  });
+  saveNotifications(list);
+}
+export function markAllNotificationsRead() {
+  saveNotifications(getNotifications().map((n) => ({ ...n, read: true })));
+}
+export function clearNotifications() {
+  saveNotifications([]);
+}
+export function markNotificationRead(id: string) {
+  saveNotifications(
+    getNotifications().map((n) => (n.id === id ? { ...n, read: true } : n)),
+  );
+}
+
+/* ---- Command palette history ---- */
+export function getCommandHistory(): string[] {
+  return read<string[]>(KEYS.cmdHistory, []);
+}
+export function pushCommandHistory(url: string) {
+  const prev = getCommandHistory().filter((u) => u !== url);
+  prev.unshift(url);
+  write(KEYS.cmdHistory, prev.slice(0, 6));
+}
+
+/* ---- Analytics helpers ---- */
+export function estimatedHoursSaved(stats: Stats): number {
+  const minutes =
+    stats.email * 8 +
+    stats.research * 20 +
+    stats.meeting * 15 +
+    stats.tasks * 10 +
+    stats.chat * 5;
+  return Math.round((minutes / 60) * 10) / 10;
+}
+export function activityByDay(
+  activity: ActivityEntry[],
+  days = 7,
+): { day: string; count: number; date: string }[] {
+  const out: { day: string; count: number; date: string }[] = [];
+  const now = new Date();
+  for (let i = days - 1; i >= 0; i--) {
+    const d = new Date(now);
+    d.setDate(now.getDate() - i);
+    d.setHours(0, 0, 0, 0);
+    const start = d.getTime();
+    const end = start + 24 * 3600 * 1000;
+    const count = activity.filter(
+      (a) => a.createdAt >= start && a.createdAt < end,
+    ).length;
+    out.push({
+      day: d.toLocaleDateString(undefined, { weekday: "short" }),
+      date: d.toLocaleDateString(),
+      count,
+    });
+  }
+  return out;
+}
+export function novaInsights(stats: Stats, streakDays: number): string[] {
+  const tips: string[] = [];
+  const total = Object.values(stats).reduce((a, b) => a + b, 0);
+  const entries = Object.entries(stats) as [ActivityKind, number][];
+  const top = entries.sort((a, b) => b[1] - a[1])[0];
+  if (stats.email >= 3)
+    tips.push(
+      "You're creating similar emails frequently. Consider saving one as a reusable template.",
+    );
+  if (stats.meeting >= 3)
+    tips.push(
+      "Your meeting summaries have increased this week. Creating project folders could improve organization.",
+    );
+  if (streakDays >= 7)
+    tips.push(
+      `You've maintained a ${streakDays}-day productivity streak. Excellent consistency!`,
+    );
+  if (top && top[1] > 0) {
+    const label = top[0].charAt(0).toUpperCase() + top[0].slice(1);
+    tips.push(
+      `${label} is your most-used feature — try a prompt template to move faster.`,
+    );
+  }
+  if (total === 0)
+    tips.push(
+      "Try Nova's Smart Email or Research tools to see personalized insights here.",
+    );
+  return tips.slice(0, 4);
+}
