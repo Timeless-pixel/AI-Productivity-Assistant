@@ -14,6 +14,7 @@ import { reportLovableError } from "../lib/lovable-error-reporting";
 import { SidebarProvider, SidebarTrigger, SidebarInset } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
 import { Toaster } from "@/components/ui/sonner";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 function NotFoundComponent() {
   return (
@@ -128,25 +129,30 @@ function RootComponent() {
   const { queryClient } = Route.useRouteContext();
 
   useEffect(() => {
-    // Apply persisted theme
-    try {
-      const raw = window.localStorage.getItem("workwise:settings");
-      const theme = raw ? (JSON.parse(raw).theme as string) : "light";
-      document.documentElement.classList.toggle("dark", theme === "dark");
-    } catch {
-      // ignore
-    }
-    const handler = () => {
+    const apply = () => {
+      let mode: string = "dynamic";
       try {
         const raw = window.localStorage.getItem("workwise:settings");
-        const theme = raw ? (JSON.parse(raw).theme as string) : "light";
-        document.documentElement.classList.toggle("dark", theme === "dark");
-      } catch {
-        // ignore
+        if (raw) mode = (JSON.parse(raw).theme as string) ?? "dynamic";
+      } catch {}
+      const html = document.documentElement;
+      html.classList.add("theme-anim");
+      html.classList.remove("dark", "sunrise", "sunset");
+      if (mode === "dark") html.classList.add("dark");
+      else if (mode === "dynamic") {
+        const h = new Date().getHours();
+        html.classList.add(h >= 6 && h < 18 ? "sunrise" : "sunset");
       }
+      window.setTimeout(() => html.classList.remove("theme-anim"), 500);
     };
-    window.addEventListener("workwise:update", handler);
-    return () => window.removeEventListener("workwise:update", handler);
+    apply();
+    window.addEventListener("workwise:update", apply);
+    // re-check every minute for dynamic mode transitions
+    const interval = window.setInterval(apply, 60_000);
+    return () => {
+      window.removeEventListener("workwise:update", apply);
+      window.clearInterval(interval);
+    };
   }, []);
 
   return (
@@ -159,6 +165,9 @@ function RootComponent() {
               <SidebarTrigger />
               <div className="ml-1 text-sm font-medium text-muted-foreground">
                 WorkWise AI
+              </div>
+              <div className="ml-auto flex items-center gap-1">
+                <ThemeToggle />
               </div>
             </header>
             <main className="flex-1 px-4 py-6 sm:px-6 lg:px-8">

@@ -5,6 +5,9 @@ import {
   getSettings,
   getStats,
   getThreads,
+  getStreak,
+  getWorkspace,
+  getFavoriteTemplates,
   setProfile as writeProfile,
   setSettings as writeSettings,
   type ActivityEntry,
@@ -12,6 +15,8 @@ import {
   type Settings,
   type Stats,
   type Thread,
+  type Streak,
+  type WorkspaceDoc,
 } from "@/lib/storage";
 
 function useStore<T>(read: () => T): [T, () => void] {
@@ -46,6 +51,15 @@ export function useProfile(): [Profile, (p: Profile) => void] {
 export function useSettings(): [Settings, (s: Settings) => void] {
   const [value] = useStore(getSettings);
   return [value, (s) => writeSettings(s)];
+}
+export function useStreak(): Streak {
+  return useStore(getStreak)[0];
+}
+export function useWorkspace(): WorkspaceDoc[] {
+  return useStore(getWorkspace)[0];
+}
+export function useFavoriteTemplates(): string[] {
+  return useStore(getFavoriteTemplates)[0];
 }
 
 export function useHydrated() {

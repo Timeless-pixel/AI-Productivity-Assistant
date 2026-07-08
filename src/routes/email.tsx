@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Mail, Trash2, Wand2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -30,10 +30,14 @@ export const Route = createFileRoute("/email")({
       },
     ],
   }),
+  validateSearch: (s: Record<string, unknown>) => ({
+    prompt: typeof s.prompt === "string" ? s.prompt : undefined,
+  }),
   component: EmailPage,
 });
 
 function EmailPage() {
+  const search = Route.useSearch();
   const run = useServerFn(generateEmail);
   const [purpose, setPurpose] = useState("");
   const [recipient, setRecipient] = useState("");
@@ -43,6 +47,17 @@ function EmailPage() {
   const [output, setOutput] = useState("");
   const [ts, setTs] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (search.prompt) {
+      try {
+        const decoded = decodeURIComponent(search.prompt);
+        setDetails((d) => (d ? d : decoded));
+        if (!purpose) setPurpose(decoded.slice(0, 80));
+      } catch {}
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [search.prompt]);
 
   const submit = async () => {
     if (!purpose.trim()) {
@@ -164,6 +179,8 @@ function EmailPage() {
             loading={loading}
             timestamp={ts}
             onRegenerate={output ? submit : undefined}
+            saveKind="email"
+            saveTitle={purpose}
             emptyMessage="Fill in the details on the left, then Nova will draft your email here."
           />
         </div>

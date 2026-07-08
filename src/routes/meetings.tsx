@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FileText, Wand2, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -19,15 +19,28 @@ export const Route = createFileRoute("/meetings")({
       { name: "description", content: "Turn raw meeting notes into clear summaries with action items." },
     ],
   }),
+  validateSearch: (s: Record<string, unknown>) => ({
+    prompt: typeof s.prompt === "string" ? s.prompt : undefined,
+  }),
   component: MeetingsPage,
 });
 
 function MeetingsPage() {
+  const search = Route.useSearch();
   const run = useServerFn(summariseMeeting);
   const [notes, setNotes] = useState("");
   const [output, setOutput] = useState("");
   const [ts, setTs] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (search.prompt && !notes) {
+      try {
+        setNotes(decodeURIComponent(search.prompt));
+      } catch {}
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [search.prompt]);
 
   const submit = async () => {
     if (notes.trim().length < 20) {
@@ -93,6 +106,8 @@ function MeetingsPage() {
           loading={loading}
           timestamp={ts}
           onRegenerate={output ? submit : undefined}
+          saveKind="meeting"
+          saveTitle={notes.slice(0, 60)}
           emptyMessage="Your meeting summary will appear here."
           extraActions={
             output ? (

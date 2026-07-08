@@ -1,9 +1,10 @@
-import { useMemo, useState } from "react";
-import { Copy, RefreshCw, Check, Loader2 } from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { Copy, RefreshCw, Check, BookmarkPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { NovaAvatar } from "./nova-avatar";
 import { toast } from "sonner";
+import { addWorkspaceDoc, type ActivityKind } from "@/lib/storage";
 
 function renderMarkdown(md: string): string {
   // Minimal, safe-ish markdown -> HTML for our controlled AI output.
@@ -79,6 +80,8 @@ export function AiOutputCard({
   timestamp,
   emptyMessage = "Your AI-generated response will appear here.",
   extraActions,
+  saveKind,
+  saveTitle,
 }: {
   content: string;
   loading?: boolean;
@@ -86,9 +89,49 @@ export function AiOutputCard({
   timestamp?: number | null;
   emptyMessage?: string;
   extraActions?: React.ReactNode;
+  saveKind?: ActivityKind;
+  saveTitle?: string;
 }) {
   const [copied, setCopied] = useState(false);
+  const [saved, setSaved] = useState(false);
   const html = useMemo(() => (content ? renderMarkdown(content) : ""), [content]);
+  const lastNotified = useRef<string>("");
+
+  // Rotating thinking messages
+  const thinkingSteps = useMemo(
+    () => [
+      "🤖 Nova is thinking…",
+      saveKind === "email"
+        ? "✍️ Writing your professional email…"
+        : saveKind === "research"
+          ? "📚 Researching your topic…"
+          : saveKind === "meeting"
+            ? "📝 Organising your meeting notes…"
+            : saveKind === "tasks"
+              ? "📅 Planning your schedule…"
+              : "🧠 Analysing your request…",
+      "💡 Generating the best response…",
+    ],
+    [saveKind],
+  );
+  const [stepIx, setStepIx] = useState(0);
+  useEffect(() => {
+    if (!loading) {
+      setStepIx(0);
+      return;
+    }
+    const id = window.setInterval(() => setStepIx((i) => (i + 1) % thinkingSteps.length), 1800);
+    return () => window.clearInterval(id);
+  }, [loading, thinkingSteps.length]);
+
+  // Success notification on completion (once per new content)
+  useEffect(() => {
+    if (!loading && content && lastNotified.current !== content) {
+      lastNotified.current = content;
+      toast.success("✅ Response generated successfully");
+      setSaved(false);
+    }
+  }, [loading, content]);
 
   const copy = async () => {
     try {
@@ -99,6 +142,18 @@ export function AiOutputCard({
     } catch {
       toast.error("Copy failed");
     }
+  };
+
+  const save = () => {
+    if (!content || !saveKind) return;
+    addWorkspaceDoc({
+      title: saveTitle?.trim() || `${saveKind} — ${new Date().toLocaleString()}`,
+      content,
+      source: saveKind,
+    });
+    setSaved(true);
+    toast.success("Saved to workspace");
+    setTimeout(() => setSaved(false), 1500);
   };
 
   const time = timestamp
@@ -119,6 +174,18 @@ export function AiOutputCard({
         </div>
         <div className="flex items-center gap-1">
           {extraActions}
+          {saveKind && (
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={save}
+              disabled={!content || loading}
+              className="gap-1.5"
+            >
+              {saved ? <Check className="h-4 w-4" /> : <BookmarkPlus className="h-4 w-4" />}
+              <span className="hidden sm:inline">Save</span>
+            </Button>
+          )}
           {onRegenerate && (
             <Button
               size="sm"
@@ -145,13 +212,28 @@ export function AiOutputCard({
       </div>
       <div className="min-h-[180px] px-5 py-4">
         {loading && !content ? (
-          <div className="flex items-center gap-3 text-muted-foreground">
-            <Loader2 className="h-5 w-5 animate-spin text-primary" />
-            <span className="text-sm">Nova is writing your response…</span>
+          <div className="flex items-center gap-3">
+            <NovaAvatar size={36} className="animate-pulse" />
+            <div>
+              <div key={stepIx} className="animate-fade-in text-sm font-medium text-foreground">
+                {thinkingSteps[stepIx]}
+              </div>
+              <div className="mt-1.5 flex gap-1">
+                <span className="nova-dot h-1.5 w-1.5 rounded-full bg-primary" />
+                <span
+                  className="nova-dot h-1.5 w-1.5 rounded-full bg-primary"
+                  style={{ animationDelay: "0.2s" }}
+                />
+                <span
+                  className="nova-dot h-1.5 w-1.5 rounded-full bg-primary"
+                  style={{ animationDelay: "0.4s" }}
+                />
+              </div>
+            </div>
           </div>
         ) : content ? (
           <div
-            className="prose prose-sm max-w-none text-foreground"
+            className="prose prose-sm max-w-none animate-fade-in text-foreground"
             // eslint-disable-next-line react/no-danger
             dangerouslySetInnerHTML={{ __html: html }}
           />

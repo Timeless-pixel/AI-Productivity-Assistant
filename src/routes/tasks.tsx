@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ListChecks, Wand2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -20,6 +20,9 @@ export const Route = createFileRoute("/tasks")({
       { name: "description", content: "Turn a workplace goal into an actionable prioritised plan." },
     ],
   }),
+  validateSearch: (s: Record<string, unknown>) => ({
+    prompt: typeof s.prompt === "string" ? s.prompt : undefined,
+  }),
   component: TasksPage,
 });
 
@@ -37,12 +40,22 @@ function extractTasks(md: string): Task[] {
 }
 
 function TasksPage() {
+  const search = Route.useSearch();
   const run = useServerFn(planTasks);
   const [goal, setGoal] = useState("");
   const [output, setOutput] = useState("");
   const [ts, setTs] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
   const [checks, setChecks] = useState<Record<number, boolean>>({});
+
+  useEffect(() => {
+    if (search.prompt && !goal) {
+      try {
+        setGoal(decodeURIComponent(search.prompt));
+      } catch {}
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [search.prompt]);
 
   const tasks = useMemo(() => extractTasks(output), [output]);
 
@@ -142,6 +155,8 @@ function TasksPage() {
             loading={loading}
             timestamp={ts}
             onRegenerate={output ? submit : undefined}
+            saveKind="tasks"
+            saveTitle={goal}
             emptyMessage="Enter a goal to generate a full task plan."
           />
         </div>

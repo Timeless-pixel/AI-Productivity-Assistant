@@ -9,6 +9,8 @@ import {
   ShieldCheck,
   User,
   Settings as SettingsIcon,
+  LibraryBig,
+  FolderKanban,
 } from "lucide-react";
 import {
   Sidebar,
@@ -31,6 +33,8 @@ const primary = [
   { title: "AI Chatbot", url: "/chat", icon: MessageSquare },
   { title: "Meeting Notes", url: "/meetings", icon: FileText },
   { title: "Task Planner", url: "/tasks", icon: ListChecks },
+  { title: "Templates", url: "/templates", icon: LibraryBig },
+  { title: "Workspace", url: "/workspace", icon: FolderKanban },
 ];
 
 const secondary = [
