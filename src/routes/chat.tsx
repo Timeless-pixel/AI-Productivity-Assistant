@@ -3,7 +3,7 @@ import { useMemo } from "react";
 import { MessageSquare, Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { useHydrated, useThreads } from "@/hooks/use-storage";
+import { useThreads } from "@/hooks/use-storage";
 import {
   deleteThread as deleteThreadStorage,
   upsertThread,
@@ -21,7 +21,6 @@ export const Route = createFileRoute("/chat")({
 
 function ChatLayout() {
   const threads = useThreads();
-  const hydrated = useHydrated();
   const navigate = useNavigate();
   const params = useParams({ strict: false }) as { threadId?: string };
   const activeId = params.threadId;
@@ -100,6 +99,3 @@ function ChatLayout() {
     </div>
   );
 }
-
-// Suppress unused warning if hydrated ever unused
-void useHydrated;
