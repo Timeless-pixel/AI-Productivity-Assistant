@@ -94,10 +94,14 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       {
         property: "og:description",
         content:
-          "One AI workspace for emails, research, meetings, task planning and chat with Nova.",
+          "WorkWise AI is an all-in-one AI productivity workspace with Nova — write emails, research topics, plan tasks, summarise meetings and chat.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "WorkWise AI — Your intelligent workplace productivity assistant" },
+      { name: "twitter:description", content: "WorkWise AI is an all-in-one AI productivity workspace with Nova — write emails, research topics, plan tasks, summarise meetings and chat." },
+      { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/c76d68b6-068b-45ca-8134-249776eefb24" },
+      { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/c76d68b6-068b-45ca-8134-249776eefb24" },
     ],
     links: [
       {
