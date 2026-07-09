@@ -24,14 +24,18 @@ const EmailInput = z.object({
   tone: z.string().default("Professional"),
   length: z.string().default("Medium"),
   details: z.string().default(""),
+  emailType: z.string().default("General"),
 });
 
 export const generateEmail = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => EmailInput.parse(input))
   .handler(async ({ data }) => {
-    const system =
+    const baseSystem =
       "You are a professional workplace communication expert. Generate a polished email using the user's purpose, recipient, tone, length, and additional details. Include a subject line, greeting, clear body, and professional closing. Format the response as markdown with clearly labeled sections: **Subject:**, then the greeting on its own line, then the body, then the closing.";
-    const prompt = `Purpose: ${data.purpose}\nRecipient: ${data.recipient || "(unspecified)"}\nTone: ${data.tone}\nLength: ${data.length}\nAdditional details: ${data.details || "(none)"}`;
+    const updateAddendum =
+      " This is a PROGRESS UPDATE email. Structure the body to clearly cover, in this order: (1) a brief summary of completed work, (2) the current status of the project or task, (3) any challenges, blockers, or delays (only if mentioned in the details — otherwise omit or note 'no blockers at this time'), (4) the next steps and upcoming milestones. Where information is missing, make reasonable, realistic workplace assumptions and keep the email concise and professional. Respect the requested tone and length.";
+    const system = data.emailType === "Update" ? baseSystem + updateAddendum : baseSystem;
+    const prompt = `Email type: ${data.emailType}\nPurpose: ${data.purpose}\nRecipient: ${data.recipient || "(unspecified)"}\nTone: ${data.tone}\nLength: ${data.length}\nAdditional details: ${data.details || "(none)"}`;
     return { text: await runPrompt(system, prompt) };
   });
 
