@@ -9,10 +9,8 @@ async function runPrompt(system: string, prompt: string) {
   const gateway = createLovableAiGatewayProvider(getLovableApiKey());
   const { text } = await generateText({
     model: gateway(MODEL),
-    messages: [
-      { role: "system", content: system },
-      { role: "user", content: prompt },
-    ],
+    system,
+    prompt,
   });
   return text;
 }
