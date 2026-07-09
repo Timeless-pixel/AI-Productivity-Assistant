@@ -43,6 +43,7 @@ function EmailPage() {
   const [recipient, setRecipient] = useState("");
   const [tone, setTone] = useState("Professional");
   const [length, setLength] = useState("Medium");
+  const [emailType, setEmailType] = useState("General");
   const [details, setDetails] = useState("");
   const [output, setOutput] = useState("");
   const [ts, setTs] = useState<number | null>(null);
@@ -66,7 +67,7 @@ function EmailPage() {
     }
     setLoading(true);
     try {
-      const res = await run({ data: { purpose, recipient, tone, length, details } });
+      const res = await run({ data: { purpose, recipient, tone, length, details, emailType } });
       setOutput(res.text);
       setTs(Date.now());
       bumpStat("email");
@@ -82,6 +83,7 @@ function EmailPage() {
     setPurpose("");
     setRecipient("");
     setDetails("");
+    setEmailType("General");
     setOutput("");
     setTs(null);
   };
@@ -109,6 +111,26 @@ function EmailPage() {
                 value={purpose}
                 onChange={(e) => setPurpose(e.target.value)}
               />
+            </div>
+            <div className="space-y-1.5">
+              <Label>Email type</Label>
+              <Select value={emailType} onValueChange={setEmailType}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {["General", "Update", "Follow-up", "Request", "Announcement", "Thank you"].map((t) => (
+                    <SelectItem key={t} value={t}>
+                      {t}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {emailType === "Update" && (
+                <p className="text-xs text-muted-foreground">
+                  Nova will structure a progress update: completed work, current status, challenges, and next steps.
+                </p>
+              )}
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="recipient">Recipient</Label>
